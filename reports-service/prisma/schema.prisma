@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:root1234@localhost:3306/crimeTheft"
+}
+
+model applications {
+  application_id Int    @id @default(autoincrement())
+  ID_number      Int
+  Type           String @db.Char(100)
+  status         String @default("Not issued") @db.VarChar(1000)
+}
+
+model attempts {
+  id         Int      @id
+  ip         String   @db.VarChar(39)
+  count      Int
+  expiredate DateTime @db.DateTime(0)
+}
+
+model config {
+  id      Int     @id
+  setting String  @db.VarChar(100)
+  value   String? @db.VarChar(100)
+}
+
+model crimes {
+  Crime_No    Int    @id @default(autoincrement())
+  Status      String @default("No action") @db.Char(100)
+  Category    String @db.Char(100)
+  Description String @db.Char(100)
+  Crime_Scene String @db.Char(100)
+  Suspects    String @default("Not yet") @db.Char(100)
+  phoneNumber Int
+  Address     String @db.VarChar(100)
+  evidence    String @db.Text
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model investigations {
+  Crime_No Int
+  Status   String @db.Char(100)
+
+  @@index([Crime_No], map: "Crime_No")
+  @@ignore
+}
+
+model items {
+  Item_NO     Int      @id @default(autoincrement())
+  Description String   @db.Char(100)
+  Last_Seen   DateTime @db.Date
+  Item_Name   String   @db.VarChar(1000)
+  category    String   @db.Char(100)
+  status      String   @default("Not found") @db.Char(100)
+}
+
+model lost_valuables {
+  id          Int    @id @default(autoincrement())
+  item_name   String @db.Char(100)
+  description String @db.VarChar(1000)
+  image       String @db.Text
+}
+
+model missing_persons {
+  person_id   Int    @id @default(autoincrement())
+  fullName    String @db.Char(100)
+  Address     String @db.VarChar(100)
+  phoneNumber Int
+  Description String @db.Text
+  Image       String @db.VarChar(100)
+  Status      String @default("Not Found") @db.VarChar(50)
+  alert       String @default("Not posted") @db.VarChar(100)
+}
+
+model missing_vehicles {
+  vehicle_id   Int    @id @default(autoincrement())
+  Number_plate String @db.VarChar(100)
+  Model        String @db.VarChar(200)
+  Owner        String @db.VarChar(100)
+  phoneNumber  Int
+  national_id  Int
+  description  String @db.Text
+  image        String @db.Text
+  reviewed     String @default("Not reviewed") @db.VarChar(1000)
+}
+
+model missing_vehicles_found {
+  vehicle_id    Int    @id @default(autoincrement())
+  Number_plate  String @db.VarChar(100)
+  Model         String @db.VarChar(200)
+  location_seen String @db.VarChar(100)
+  phoneNumber   Int
+  national_id   Int
+  description   String @db.Text
+  image         String @db.Text
+  status        String @default("Not reviewed") @db.VarChar(100)
+}
+
+model persons {
+  firstName String @db.Char(100)
+  lastName  String @db.Char(100)
+  ID_Number Int    @id
+  Location  String @db.Char(100)
+  Gender    String @db.Char(100)
+}
+
+model requests {
+  id     Int      @id
+  uid    Int
+  rkey   String   @db.VarChar(20)
+  expire DateTime @db.DateTime(0)
+  type   String   @db.VarChar(20)
+}
+
+model sessions {
+  id         Int      @id
+  uid        Int
+  hash       String   @db.VarChar(40)
+  expiredate DateTime @db.DateTime(0)
+  ip         String   @db.VarChar(39)
+  agent      String   @db.VarChar(200)
+  cookie_crc String   @db.VarChar(40)
+}
+
+model users {
+  id       Int     @id
+  password String? @db.VarChar(60)
+  email    String? @db.VarChar(100)
+}
