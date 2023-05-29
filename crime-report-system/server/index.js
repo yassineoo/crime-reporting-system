@@ -8,7 +8,7 @@ const Reports = require('./services/reports');
 const Investigations = require('./services/investigations');
 
 const routes = require('./routes');
-
+const cors = require('cors');
 const app = express();
 
 const config = configs[app.get('env')];
@@ -17,7 +17,9 @@ const investigations = new Investigations(config);
 const reports = new Reports(config);
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
+const cors = require('cors');
+const cors = require('cors');
+app.use(cors());
 app.use(
 	'/',
 	routes({
