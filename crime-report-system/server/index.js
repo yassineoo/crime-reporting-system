@@ -7,7 +7,7 @@ const configs = require("./config");
 const Reports = require("./services/reports");
 const Investigations = require("./services/investigations");
 
-const routes = require("./routes");
+const routes = require('./routes');
 
 const app = express();
 
@@ -19,8 +19,6 @@ const investigations = new Investigations(config);
 const reports = new Reports(config);
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cors());
 
 app.use(
 	"/",
