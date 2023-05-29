@@ -24,12 +24,13 @@ class ReportsService {
 		return ch.sendToQueue(q, Buffer.from(qm, 'utf8'));
 	}
 */
-	async getReportsList() {
+	async getReportsList(user) {
 		const { ip, port } = await this.getService('reports-service');
 		console.log('we are calling the reports ');
 		return this.callService({
 			method: 'get',
 			url: `http://${ip}:${port}/reports`,
+			user: user,
 		});
 	}
 

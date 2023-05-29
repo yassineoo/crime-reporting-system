@@ -1,12 +1,12 @@
 const express = require('express');
 // const amqplib = require('amqplib');
 
-const Reports = require('./lib/reports');
+const Investigations = require('./lib/investigations');
 
 const service = express();
 
 module.exports = (config) => {
-	const reports = new Reports();
+	const investigations = new Investigations();
 
 	const log = config.log();
 	/*
@@ -40,11 +40,9 @@ module.exports = (config) => {
 		});
 	}
 
-	service.get('/reports', async (req, res, next) => {
-		console.log(req.user);
-
+	service.get('/investigations', async (req, res, next) => {
 		try {
-			return res.json(await reports.getReportsList(req.user));
+			return res.json(await investigations.getList());
 		} catch (err) {
 			return next(err);
 		}

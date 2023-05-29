@@ -1,12 +1,12 @@
 const express = require('express');
 // const amqplib = require('amqplib');
 
-const Reports = require('./lib/reports');
+const Authentification = require('./lib/authentification');
 
 const service = express();
-
+service.use(express.json());
 module.exports = (config) => {
-	const reports = new Reports();
+	const authentification = new Authentification();
 
 	const log = config.log();
 	/*
@@ -40,11 +40,14 @@ module.exports = (config) => {
 		});
 	}
 
-	service.get('/reports', async (req, res, next) => {
-		console.log(req.user);
-
+	service.post('/login', async (req, res, next) => {
+		console.log('getting the  reports ...');
+		const { username, password } = req.body;
+		console.log(req.body);
 		try {
-			return res.json(await reports.getReportsList(req.user));
+			return res.json(
+				await authentification.login(username, password)
+			);
 		} catch (err) {
 			return next(err);
 		}

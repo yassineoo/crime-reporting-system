@@ -1,5 +1,3 @@
-const prisma = require('../../prisma/dbConnection');
-
 class ReportsService {
 	constructor() {}
 	async getReportsList(user) {
@@ -13,9 +11,9 @@ class ReportsService {
 		return res;
 	}
 
-	async allowed(user, permission) {
+	async allowed(user, permissionName) {
 		const permission = await prisma.permission.findFirst({
-			where: { permission_name: permission },
+			where: { permission_name: permissionName },
 		});
 		const allowed = await prisma.role_permissions.findFirst({
 			where: {

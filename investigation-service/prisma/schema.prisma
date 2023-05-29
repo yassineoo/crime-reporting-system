@@ -41,7 +41,7 @@ model crimes {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model investigations {
-  Crime_No Int    @id @default(autoincrement())
+  Crime_No Int
   Status   String @db.Char(100)
 
   @@index([Crime_No], map: "Crime_No")
