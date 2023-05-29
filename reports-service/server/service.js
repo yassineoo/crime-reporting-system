@@ -9,29 +9,7 @@ module.exports = (config) => {
 	const reports = new Reports();
 
 	const log = config.log();
-	/*
-	const q = 'feedback';
 
-	amqplib
-		.connect('amqp://localhost')
-		.then((conn) => conn.createChannel())
-		.then((ch) =>
-			ch.assertQueue(q).then(() =>
-				ch.consume(q, (msg) => {
-					if (msg !== null) {
-						log.debug(
-							`Got message ${msg.content.toString()}`
-						);
-						const qm = JSON.parse(msg.content.toString());
-						feedback
-							.addEntry(qm.name, qm.title, qm.message)
-							.then(() => ch.ack(msg));
-					}
-				})
-			)
-		)
-		.catch((err) => log.fatal(err));
-*/
 	// Add a request logging middleware in development mode
 	if (service.get('env') === 'development') {
 		service.use((req, res, next) => {
@@ -41,15 +19,29 @@ module.exports = (config) => {
 	}
 
 	service.get('/reports', async (req, res, next) => {
-		console.log('getting the  reports ...');
+		const user = {
+			id: req.headers.user_id,
+			idRole: req.headers.user_role,
+		};
 		try {
-			return res.json(await reports.getList());
+			return res.json(await reports.getReportsList(user));
+		} catch (err) {
+			return next(err);
+		}
+	});
+	service.get('/getReportById/:id', async (req, res, next) => {
+		const user = {
+			id: req.headers.user_id,
+			idRole: req.headers.user_role,
+		};
+		const id = req.params.id;
+		try {
+			return res.json(await reports.getReportById(user, id));
 		} catch (err) {
 			return next(err);
 		}
 	});
 
-	// eslint-disable-next-line no-unused-vars
 	service.use((error, req, res, next) => {
 		res.status(error.status || 500);
 		// Log out the error to the console
