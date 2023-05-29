@@ -15,8 +15,7 @@ const Authorization = async (req, res, next) => {
 		console.log(decoded);
 		req.user = {
 			id: decoded?.id,
-			role: decoded.role,
-			idRole: decoded.role_id,
+			idRole: decoded.idRole,
 		};
 
 		next();

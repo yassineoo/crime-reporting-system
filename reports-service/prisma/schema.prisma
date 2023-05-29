@@ -41,7 +41,7 @@ model crimes {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model investigations {
-  Crime_No Int    @id @default(autoincrement())
+  Crime_No Int
   Status   String @db.Char(100)
 
   @@index([Crime_No], map: "Crime_No")
@@ -126,7 +126,30 @@ model sessions {
 }
 
 model users {
-  id       Int     @id
-  password String? @db.VarChar(60)
-  email    String? @db.VarChar(100)
+  id               Int       @id
+  password         String?   @db.VarChar(60)
+  username         String?   @db.VarChar(100)
+  attempts         Int?      @default(0)
+  lockoutStartDate DateTime? @db.DateTime(0)
+  role_id          Int?
+
+  @@index([role_id], map: "role_id")
+}
+
+model permissions {
+  permission_id   Int     @id
+  permission_name String? @db.VarChar(100)
+}
+
+model role_permissions {
+  role_id       Int
+  permission_id Int
+
+  @@id([role_id, permission_id])
+  @@index([permission_id], map: "permission_id")
+}
+
+model roles {
+  role_id   Int     @id
+  role_name String? @db.VarChar(100)
 }

@@ -14,23 +14,35 @@ class ReportsService {
 		this.serviceVersion = serviceVersion;
 	}
 
-	/*
-	async addEntry(name, title, message) {
-		const q = 'feedback';
-		const conn = await amqplib.connect('amqp://localhost');
-		const ch = await conn.createChannel();
-		await ch.assertQueue(q);
-		const qm = JSON.stringify({ name, title, message });
-		return ch.sendToQueue(q, Buffer.from(qm, 'utf8'));
-	}
-*/
 	async getReportsList(user) {
 		const { ip, port } = await this.getService('reports-service');
-		console.log('we are calling the reports ');
+		const queryParams = user;
+		console.log('we are calling the reports ', user);
 		return this.callService({
 			method: 'get',
 			url: `http://${ip}:${port}/reports`,
-			user: user,
+
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
+
+	async getReportById(user, idReport) {
+		const { ip, port } = await this.getService('reports-service');
+
+		console.log('we are calling the reports ', user);
+		return this.callService({
+			method: 'get',
+			url: `http://${ip}:${port}/getReportById/${idReport}`,
+
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
 		});
 	}
 

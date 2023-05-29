@@ -16,10 +16,10 @@ module.exports = (param) => {
 		}
 	});
 
-	router.get('/:idreport', async (req, res, next) => {
+	router.get('/:idreport', Authorization, async (req, res, next) => {
 		try {
-			const { idReport } = req.params.idreport;
-			const results = await reports.getReportById(idReport, req.user);
+			const idReport = req.params.idreport;
+			const results = await reports.getReportById(req.user, idReport);
 			return res.status(200).json(results);
 		} catch (err) {
 			return next(err);
