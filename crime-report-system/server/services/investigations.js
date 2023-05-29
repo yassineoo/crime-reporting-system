@@ -13,21 +13,20 @@ class InvestigationsService {
 		this.serviceRegistryUrl = serviceRegistryUrl;
 		this.serviceVersion = serviceVersion;
 	}
-	/*
-	async addEntry(name, title, message) {
-		const q = 'feedback';
-		const conn = await amqplib.connect('amqp://localhost');
-		const ch = await conn.createChannel();
-		await ch.assertQueue(q);
-		const qm = JSON.stringify({ name, title, message });
-		return ch.sendToQueue(q, Buffer.from(qm, 'utf8'));
-	}
-*/
-	async getReportsList() {
-		const { ip, port } = await this.getService('reports-service');
+
+	async getInvestigationList(user) {
+		console.log('second inves getalll');
+
+		const { ip, port } = await this.getService('investigations-service');
 		return this.callService({
 			method: 'get',
-			url: `http://${ip}:${port}/reports`,
+			url: `http://${ip}:${port}/investigations`,
+
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
 		});
 	}
 

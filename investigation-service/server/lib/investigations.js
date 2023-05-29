@@ -5,8 +5,8 @@ class InvestigationsService {
 
 	async getInvestigationsList(user) {
 		let res;
-		if (await this.allowed(user, 'read_all_reports')) {
-			res = await prisma.investigations.findMany();
+		if (await this.allowed(user, 'read_all_investigations')) {
+			res = await prisma.investigation.findMany();
 		} else {
 			res = { message: 'you  are not authrized ' };
 		}
@@ -16,7 +16,7 @@ class InvestigationsService {
 	async getInvestigationsById(user, id) {
 		let res;
 		if (await this.allowed(user, 'read_all_investigations')) {
-			const investigations = await prisma.investigations.findFirst({
+			const investigations = await prisma.investigation.findFirst({
 				where: { Crime_No: Number(id) },
 			});
 
@@ -28,16 +28,36 @@ class InvestigationsService {
 		return res;
 	}
 
-	async createInvestigations(user, id) {
+	async createInvestigations(user, data) {
 		let res;
-		if (await this.allowed(user, 'read_all_investigations')) {
-			const investigations = await prisma.investigations.create({
-				where: { Crime_No: Number(id) },
+		if (await this.allowed(user, 'create_investigation')) {
+			const investigations = await prisma.investigation.create({
+				data,
 			});
 
 			res = { ...investigations };
 		} else {
-			res = { message: 'you  are not authrized ' };
+			res = {
+				message: 'You are not authorized to Create investigations. ',
+			};
+		}
+
+		return res;
+	}
+
+	async updateInvestigation(user, id, data) {
+		let res;
+		if (await this.allowed(user, 'update_investigation')) {
+			const investigation = await prisma.investigation.update({
+				where: { id },
+				data,
+			});
+
+			res = { ...investigation };
+		} else {
+			res = {
+				message: 'You are not authorized to update investigations.',
+			};
 		}
 
 		return res;

@@ -37,15 +37,9 @@ model crimes {
   phoneNumber Int
   Address     String @db.VarChar(100)
   evidence    String @db.Text
-}
+  citezen_id  Int?
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model investigations {
-  Crime_No Int
-  Status   String @db.Char(100)
-
-  @@index([Crime_No], map: "Crime_No")
-  @@ignore
+  @@index([citezen_id], map: "citezen_id")
 }
 
 model items {
@@ -152,4 +146,37 @@ model role_permissions {
 model roles {
   role_id   Int     @id
   role_name String? @db.VarChar(100)
+}
+
+model investigation {
+  investigations_No Int       @id @default(autoincrement())
+  Status            String    @default("pending") @db.Char(50)
+  open_on           DateTime  @db.DateTime(0)
+  close_on          DateTime? @db.DateTime(0)
+  started_by        Int
+  conclusion        Int?
+  report_no         Int?
+  description       String?   @db.VarChar(500)
+  assigned_to       Int?
+  priority          String?   @db.Char(20)
+  last_updated      DateTime? @db.DateTime(0)
+
+  @@index([assigned_to], map: "fk_investigation_assigned_to")
+  @@index([started_by], map: "fk_investigation_persons")
+  @@index([report_no], map: "fk_investigation_report")
+}
+
+model reports {
+  report_No         Int      @id @default(autoincrement())
+  Status            String   @default("Not reviewd") @db.Char(100)
+  Type              String   @db.Char(100)
+  incident_location String   @db.Char(100)
+  victime_statment  String   @db.VarChar(500)
+  provided_evdence  String   @db.Char(200)
+  Sector            String   @db.VarChar(100)
+  incident_date     DateTime @db.DateTime(0)
+  submission_date   DateTime @db.DateTime(0)
+  citezen_id        Int?
+
+  @@index([citezen_id], map: "citezen_id")
 }

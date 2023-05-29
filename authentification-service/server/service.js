@@ -41,9 +41,8 @@ module.exports = (config) => {
 	}
 
 	service.post('/login', async (req, res, next) => {
-		console.log('getting the  reports ...');
 		const { username, password } = req.body;
-		console.log(req.body);
+
 		try {
 			return res.json(
 				await authentification.login(username, password)

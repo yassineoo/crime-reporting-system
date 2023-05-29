@@ -8,39 +8,20 @@ const CircuitBreaker = require('../lib/CircuitBreaker');
 
 const circuitBreaker = new CircuitBreaker();
 
-class ReportsService {
+class AuthentificationService {
 	constructor({ serviceRegistryUrl, serviceVersion }) {
 		this.serviceRegistryUrl = serviceRegistryUrl;
 		this.serviceVersion = serviceVersion;
 	}
 
-	async getReportsList(user) {
-		const { ip, port } = await this.getService('reports-service');
+	async login(dataLogin) {
+		const { ip, port } = await this.getService(
+			'authentification-service'
+		);
 		return this.callService({
-			method: 'get',
-			url: `http://${ip}:${port}/reports`,
-
-			headers: {
-				user_id: user.id,
-				user_role: user.idRole,
-				// Other custom headers if needed
-			},
-		});
-	}
-
-	async getReportById(user, idReport) {
-		const { ip, port } = await this.getService('reports-service');
-
-		console.log('we are calling the reports ', user);
-		return this.callService({
-			method: 'get',
-			url: `http://${ip}:${port}/getReportById/${idReport}`,
-
-			headers: {
-				user_id: user.id,
-				user_role: user.idRole,
-				// Other custom headers if needed
-			},
+			method: 'post',
+			url: `http://${ip}:${port}/login`,
+			data: dataLogin,
 		});
 	}
 
@@ -57,4 +38,4 @@ class ReportsService {
 	}
 }
 
-module.exports = ReportsService;
+module.exports = AuthentificationService;

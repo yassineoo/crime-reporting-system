@@ -1,12 +1,12 @@
 const express = require('express');
 const amqplib = require('amqplib');
 
-const Reports = require('./lib/reports');
+const Notification = require('./lib/notification');
 
 const service = express();
 
 module.exports = (config) => {
-	const reports = new Reports();
+	const notification = new Notification();
 
 	const log = config.log();
 
@@ -29,6 +29,7 @@ module.exports = (config) => {
 			log.fatal(err);
 		}
 	}
+	connectAndConsume();
 
 	// Add a request logging middleware in development mode
 	if (service.get('env') === 'development') {

@@ -5,7 +5,7 @@ class ReportsService {
 	async getReportsList(user) {
 		let res;
 		if (await this.allowed(user, 'read_all_reports')) {
-			res = await prisma.crimes.findMany();
+			res = await prisma.reports.findMany();
 		} else {
 			res = { message: 'you  are not authrized ' };
 		}
@@ -14,9 +14,10 @@ class ReportsService {
 	}
 	async getReportById(user, id) {
 		let res;
+
 		if (await this.allowed(user, 'read_all_reports')) {
-			const report = await prisma.crimes.findFirst({
-				where: { Crime_No: Number(id) },
+			const report = await prisma.reports.findFirst({
+				where: { report_No: Number(id) },
 			});
 			const citizen = await prisma.persons.findFirst({
 				where: { ID_Number: report.citizen_id },
@@ -28,15 +29,7 @@ class ReportsService {
 
 		return res;
 	}
-
 	async allowed(user, permission_name) {
-		console.log('//////////////////////////////////');
-		console.log('//////////////////////////////////');
-
-		console.log(user);
-		console.log('//////////////////////////////////');
-		console.log('//////////////////////////////////');
-
 		const permission = await prisma.permissions.findFirst({
 			where: { permission_name: permission_name },
 		});

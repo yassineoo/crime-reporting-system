@@ -1,13 +1,15 @@
 const express = require('express');
 
 const router = express.Router();
-
+const Authorization = require('../../middelware/auth');
 module.exports = (param) => {
-	const { investigation } = param;
+	const { investigations } = param;
 
-	router.get('/', async (req, res) => {
+	router.get('/', Authorization, async (req, res) => {
 		try {
-			const results = await investigation.getInvestigationList();
+			const results = await investigations.getInvestigationList(
+				req.user
+			);
 
 			return res.status(200).json(results);
 		} catch (err) {
@@ -15,10 +17,10 @@ module.exports = (param) => {
 		}
 	});
 
-	router.get('/:idInvestigation', async (req, res, next) => {
+	router.get('/:idInvestigation', Authorization, async (req, res, next) => {
 		try {
 			const { idInvestigation } = req.params;
-			const results = await investigation.getInvestigationtById(
+			const results = await investigations.getInvestigationtById(
 				idInvestigation
 			);
 			return res.status(200).json(results);
@@ -27,24 +29,36 @@ module.exports = (param) => {
 		}
 	});
 
-	router.post('/createInvestigation', async (req, res, next) => {
-		try {
-			const { data } = req.body;
-			const results = await investigation.createInvestigation(data);
-			return res.status(200).json(results);
-		} catch (err) {
-			return next(err);
+	router.post(
+		'/createInvestigation',
+		Authorization,
+		async (req, res, next) => {
+			try {
+				const { data } = req.body;
+				const results = await investigation.createInvestigation(
+					data
+				);
+				return res.status(200).json(results);
+			} catch (err) {
+				return next(err);
+			}
 		}
-	});
+	);
 
-	router.post('/updateInvestigation', async (req, res, next) => {
-		try {
-			const { data } = req.body;
-			const results = await investigation.updateInvestigation(data);
-			return res.status(200).json(results);
-		} catch (err) {
-			return next(err);
+	router.post(
+		'/updateInvestigation',
+		Authorization,
+		async (req, res, next) => {
+			try {
+				const { data } = req.body;
+				const results = await investigation.updateInvestigation(
+					data
+				);
+				return res.status(200).json(results);
+			} catch (err) {
+				return next(err);
+			}
 		}
-	});
+	);
 	return router;
 };

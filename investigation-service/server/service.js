@@ -9,29 +9,7 @@ module.exports = (config) => {
 	const investigations = new Investigations();
 
 	const log = config.log();
-	/*
-	const q = 'feedback';
 
-	amqplib
-		.connect('amqp://localhost')
-		.then((conn) => conn.createChannel())
-		.then((ch) =>
-			ch.assertQueue(q).then(() =>
-				ch.consume(q, (msg) => {
-					if (msg !== null) {
-						log.debug(
-							`Got message ${msg.content.toString()}`
-						);
-						const qm = JSON.parse(msg.content.toString());
-						feedback
-							.addEntry(qm.name, qm.title, qm.message)
-							.then(() => ch.ack(msg));
-					}
-				})
-			)
-		)
-		.catch((err) => log.fatal(err));
-*/
 	// Add a request logging middleware in development mode
 	if (service.get('env') === 'development') {
 		service.use((req, res, next) => {
@@ -41,8 +19,15 @@ module.exports = (config) => {
 	}
 
 	service.get('/investigations', async (req, res, next) => {
+		console.log('welcom to inves service');
+		const user = {
+			id: req.headers.user_id,
+			idRole: req.headers.user_role,
+		};
 		try {
-			return res.json(await investigations.getList());
+			return res.json(
+				await investigations.getInvestigationsList(user)
+			);
 		} catch (err) {
 			return next(err);
 		}
