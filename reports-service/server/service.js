@@ -1,15 +1,15 @@
-const express = require('express');
+const express = require("express");
 // const amqplib = require('amqplib');
 
-const Reports = require('./lib/reports');
+const Reports = require("./lib/reports");
 
 const service = express();
-const cors = require('cors');
+const cors = require("cors");
 service.use(
 	cors({
-		origin: 'http://localhost:3000',
-		methods: ['GET', 'POST'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+		allowedHeaders: ["Content-Type", "Authorization"],
 	})
 );
 module.exports = (config) => {
@@ -18,27 +18,27 @@ module.exports = (config) => {
 	const log = config.log();
 
 	// Add a request logging middleware in development mode
-	if (service.get('env') === 'development') {
+	if (service.get("env") === "development") {
 		service.use((req, res, next) => {
 			log.debug(`${req.method}: ${req.url}`);
 			return next();
 		});
 	}
 
-	service.get('/reports', async (req, res, next) => {
+	service.get("/reports", async (req, res, next) => {
 		const user = {
 			id: req.headers.user_id,
 			idRole: req.headers.user_role,
 		};
 		try {
-			return res.status(200).json({ results: [1, 2, 5] });
-			//return res.json(await reports.getReportsList(user));
+			//return res.status(200).json({ results: [1, 2, 5] });
+			return res.json(await reports.getReportsList(user));
 		} catch (err) {
 			return next(err);
 		}
 	});
 
-	service.get('/getReportById/:id', async (req, res, next) => {
+	service.get("/getReportById/:id", async (req, res, next) => {
 		const user = {
 			id: req.headers.user_id,
 			idRole: req.headers.user_role,

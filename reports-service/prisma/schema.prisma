@@ -154,7 +154,7 @@ model investigation {
   open_on           DateTime  @db.DateTime(0)
   close_on          DateTime? @db.DateTime(0)
   started_by        Int
-  conclusion        Int?
+  conclusion        String?   @db.VarChar(300)
   report_no         Int?
   description       String?   @db.VarChar(500)
   assigned_to       Int?
@@ -162,8 +162,8 @@ model investigation {
   last_updated      DateTime? @db.DateTime(0)
 
   @@index([assigned_to], map: "fk_investigation_assigned_to")
-  @@index([started_by], map: "fk_investigation_persons")
   @@index([report_no], map: "fk_investigation_report")
+  @@index([started_by], map: "started_by")
 }
 
 model reports {
@@ -179,4 +179,14 @@ model reports {
   citezen_id        Int?
 
   @@index([citezen_id], map: "citezen_id")
+}
+
+model facts_findings {
+  fact_id           Int      @id @default(autoincrement())
+  fact_time         DateTime @db.Time(0)
+  fact_date         DateTime @db.Date
+  content           String   @db.VarChar(500)
+  investigations_No Int
+
+  @@index([investigations_No], map: "investigations_No")
 }
