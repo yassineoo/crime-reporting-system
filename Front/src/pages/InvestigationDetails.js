@@ -18,10 +18,8 @@ export function InvestigationDetails() {
 	let conclusion = "Yekfa laman, tura dayen, tekfa niya deg ulawen";
 
 	return (
-		<div className='bg-gray-200 w-full px-10 py-6 flex flex-col justify-center items-center rounded-2xl'>
-			<h3 className='text-2xl font-semibold text-center'>
-				Investigation Details
-			</h3>
+		<div className='bg-gray-100 w-full px-10 py-6 flex flex-col justify-center items-center rounded-2xl'>
+			<h3 className='text-3xl font-bold text-center'>Investigation Details</h3>
 			<GeneralDetails data={generalDetails}></GeneralDetails>
 			<FactsFindings></FactsFindings>
 			<Conclusion data={conclusion}></Conclusion>

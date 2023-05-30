@@ -100,8 +100,15 @@ export function Reports() {
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 
 	async function getReports() {
-		const response = await axiosInstance.get("/reports");
+		const token = localStorage.getItem("token");
+		const response = await axiosInstance.get("/reports", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
 		const data = response.data;
+		console.log("hhhhhhhhhhhhhhhhhh");
+		console.log(response);
 		setReportLIST(data);
 	}
 

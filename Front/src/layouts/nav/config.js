@@ -38,7 +38,7 @@ const navConfig = [
 	},
 	{
 		title: "Log Out",
-		path: "/",
+		path: "/login",
 		icon: <FaSignOutAlt size={20} />,
 	},
 ];

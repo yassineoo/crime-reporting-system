@@ -34,8 +34,8 @@ export function ReportDetails() {
 	};
 
 	return (
-		<div className='bg-gray-200 w-full px-10 py-6 flex flex-col justify-center items-center rounded-2xl'>
-			<h3 className='text-2xl font-semibold text-center'>Report Details</h3>
+		<div className='bg-gray-100 w-full px-10 py-6 flex flex-col justify-center items-center rounded-2xl'>
+			<h3 className='text-3xl font-bold text-center'>Report Details</h3>
 			<GeneralDetails data={generalDetails}></GeneralDetails>
 			<ProfileDetails data={citizenDetails}></ProfileDetails>
 			<IncidentDetails data={incidentDetails}></IncidentDetails>

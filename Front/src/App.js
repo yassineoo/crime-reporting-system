@@ -4,12 +4,15 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Reports, Sidebar, Investigations } from "./pages";
 import { ReportDetails } from "./pages/ReportDetails";
 import { InvestigationDetails } from "./pages/InvestigationDetails";
+import { Login } from "./pages/Login";
 
 function App() {
 	return (
 		<ContextWrapper>
 			<Router>
 				<Routes>
+					<Route path='/login' element={<Login />} />
+
 					<Route path='/' element={<Sidebar></Sidebar>}>
 						<Route path='/reports' element={<Reports></Reports>} />
 						<Route
