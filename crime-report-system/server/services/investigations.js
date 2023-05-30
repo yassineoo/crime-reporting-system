@@ -56,6 +56,34 @@ class InvestigationsService {
 			},
 		});
 	}
+	async createFact(user, data) {
+		const { ip, port } = await this.getService('investigations-service');
+
+		return this.callService({
+			method: 'post',
+			url: `http://${ip}:${port}/investigations/createFact`,
+			data,
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
+	async updateFact(user, idFact, data) {
+		const { ip, port } = await this.getService('investigations-service');
+
+		return this.callService({
+			method: 'post',
+			url: `http://${ip}:${port}/investigations/updateFact/${idFact}`,
+			data,
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
 	async updateInvestigation(user, idInvestigation, data) {
 		const { ip, port } = await this.getService('investigations-service');
 

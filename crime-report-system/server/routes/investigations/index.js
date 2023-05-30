@@ -30,6 +30,34 @@ module.exports = (param) => {
 			return err;
 		}
 	});
+	router.post('/createFact', Authorization, async (req, res) => {
+		try {
+			const data = req.body;
+			const results = await investigations.createFact(req.user, data);
+
+			return res.status(200).json(results);
+		} catch (err) {
+			console.log(err);
+			return err;
+		}
+	});
+
+	router.post('/updateFact/:idFact', Authorization, async (req, res) => {
+		try {
+			const { idFact } = req.params;
+			const data = req.body;
+			const results = await investigations.updateFact(
+				req.user,
+				idFact,
+				data
+			);
+
+			return res.status(200).json(results);
+		} catch (err) {
+			console.log(err);
+			return err;
+		}
+	});
 
 	router.post(
 		'/:idInvestigation/update',
@@ -71,20 +99,5 @@ module.exports = (param) => {
 		}
 	);
 
-	router.post(
-		'/updateInvestigation',
-		Authorization,
-		async (req, res, next) => {
-			try {
-				const { data } = req.body;
-				const results = await investigation.updateInvestigation(
-					data
-				);
-				return res.status(200).json(results);
-			} catch (err) {
-				return next(err);
-			}
-		}
-	);
 	return router;
 };

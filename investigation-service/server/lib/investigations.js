@@ -31,9 +31,6 @@ class InvestigationsService {
 					where: { investigations_No: Number(id) },
 				});
 			}
-			console.log('-------------------------------------');
-			console.log(investigations);
-			console.log('-------------------------------------');
 
 			let report = await prisma.reports.findFirst({
 				where: { report_No: investigations.report_no },
@@ -69,6 +66,43 @@ class InvestigationsService {
 		} else {
 			res = {
 				message: 'You are not authorized to Create investigations. ',
+			};
+		}
+
+		return res;
+	}
+	async createFacts(user, data) {
+		let res;
+		if (await this.allowed(user, 'update_investigation')) {
+			const investigations = await prisma.facts_findings.create({
+				data: {
+					...data,
+				},
+			});
+
+			res = { ...investigations };
+		} else {
+			res = {
+				message: 'You are not authorized to Create Facts. ',
+			};
+		}
+
+		return res;
+	}
+	async updateFacts(user, idFact, data) {
+		let res;
+		if (await this.allowed(user, 'update_investigation')) {
+			const investigations = await prisma.facts_findings.update({
+				where: { fact_id: idFact },
+				data: {
+					...data,
+				},
+			});
+
+			res = { ...investigations };
+		} else {
+			res = {
+				message: 'You are not authorized to Create Facts. ',
 			};
 		}
 

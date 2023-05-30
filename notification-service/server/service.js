@@ -1,12 +1,12 @@
 const express = require('express');
 const amqplib = require('amqplib');
 
-const Notification = require('./lib/notification');
+//const Notification = require('./lib/notification');
 
 const service = express();
 
 module.exports = (config) => {
-	const notification = new Notification();
+	//	const notification = new Notification();
 
 	const log = config.log();
 
@@ -20,16 +20,22 @@ module.exports = (config) => {
 				if (msg !== null) {
 					log.debug(`Got message ${msg.content.toString()}`);
 					const qm = JSON.parse(msg.content.toString());
+
 					log(qm.user + ' is trying to hacked ');
-					await feedback.addEntry(qm.name, qm.title, qm.message);
+
 					await ch.ack(msg);
 				}
 			});
 		} catch (err) {
-			log.fatal(err);
+			console.error(err);
+			//log.fatal(err);
 		}
 	}
-	connectAndConsume();
+	try {
+		connectAndConsume();
+	} catch (error) {
+		console.log(error);
+	}
 
 	// Add a request logging middleware in development mode
 	if (service.get('env') === 'development') {
@@ -38,12 +44,18 @@ module.exports = (config) => {
 			return next();
 		});
 	}
+	service.get('/test', (req, res) => {
+		res.send('test');
+	});
+	service.use(function (req, res, next) {
+		res.status(404).json({ error: 'Not found' });
+	});
 
 	// eslint-disable-next-line no-unused-vars
 	service.use((error, req, res, next) => {
 		res.status(error.status || 500);
 		// Log out the error to the console
-		log.error(error);
+		//log.error(error);
 		return res.json({
 			error: {
 				message: error.message,

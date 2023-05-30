@@ -7,7 +7,7 @@ const service = express();
 const cors = require('cors');
 service.use(
 	cors({
-		origin: 'http://localhost:3000',
+		origin: '*',
 		methods: ['GET', 'POST'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
 	})

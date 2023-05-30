@@ -18,13 +18,20 @@ const cors = require('cors');
 const investigations = new Investigations(config);
 const reports = new Reports(config);
 const authentification = new Authentification(config);
-app.use(
-	cors({
-		origin: 'http://localhost:3000',
-		methods: ['GET', 'POST'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
-	})
-);
+
+let corsOptions = {
+	origin: [
+		'http://localhost:3000',
+		'0.0.0.0',
+		'http://localhost:3001',
+		'https://5295-105-235-130-83.ngrok-free.app',
+		'*',
+	],
+	//credentials: true,
+	allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
