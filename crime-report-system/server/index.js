@@ -18,7 +18,13 @@ const cors = require('cors');
 const investigations = new Investigations(config);
 const reports = new Reports(config);
 const authentification = new Authentification(config);
-
+app.use(
+	cors({
+		origin: 'http://localhost:3000',
+		methods: ['GET', 'POST'],
+		allowedHeaders: ['Content-Type', 'Authorization'],
+	})
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(

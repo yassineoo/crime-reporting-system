@@ -4,6 +4,9 @@ const router = express.Router();
 
 module.exports = (param) => {
 	const { authentification } = param;
+	router.get('/register', async (req, res, next) => {
+		res.json({ message: 'register' });
+	});
 
 	router.post('/login', async (req, res, next) => {
 		try {

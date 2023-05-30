@@ -44,9 +44,14 @@ module.exports = (config) => {
 		const { username, password } = req.body;
 
 		try {
-			return res.json(
-				await authentification.login(username, password)
+			const response = await authentification.login(
+				username,
+				password
 			);
+			console.log('-------------------');
+			console.log(response);
+			console.log('-------------------');
+			return res.json(response);
 		} catch (err) {
 			return next(err);
 		}

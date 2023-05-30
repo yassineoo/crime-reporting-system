@@ -78,7 +78,10 @@ class AuthentificationService {
 				return channel.sendToQueue(q, Buffer.from(qm, 'utf8'));
 			}
 
-			throw new Error('Invalid credentials: password');
+			return {
+				message: 'Invalid credentials: password',
+				type: 'error',
+			};
 		}
 
 		// Reset login attempts and last fail date on successful login
@@ -102,6 +105,8 @@ class AuthentificationService {
 
 		const response = {
 			token,
+			name: user.name,
+			email: user.email,
 		};
 
 		return response;
