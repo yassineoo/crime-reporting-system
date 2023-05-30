@@ -29,6 +29,47 @@ class InvestigationsService {
 			},
 		});
 	}
+	async getInvestigationById(user, id, selector) {
+		const { ip, port } = await this.getService('investigations-service');
+		console.log('we are calling the Investigations ', user);
+		return this.callService({
+			method: 'get',
+			url: `http://${ip}:${port}/investigations/${id}/${selector}`,
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
+	async createInvestigation(user, data) {
+		const { ip, port } = await this.getService('investigations-service');
+
+		return this.callService({
+			method: 'post',
+			url: `http://${ip}:${port}/investigations/create`,
+			data,
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
+	async updateInvestigation(user, idInvestigation, data) {
+		const { ip, port } = await this.getService('investigations-service');
+
+		return this.callService({
+			method: 'post',
+			url: `http://${ip}:${port}/investigations/${idInvestigation}/update`,
+			data,
+			headers: {
+				user_id: user.id,
+				user_role: user.idRole,
+				// Other custom headers if needed
+			},
+		});
+	}
 
 	async callService(reqOptions) {
 		const result = await circuitBreaker.callService(reqOptions);

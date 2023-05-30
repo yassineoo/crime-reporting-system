@@ -13,14 +13,38 @@ class InvestigationsService {
 
 		return res;
 	}
-	async getInvestigationsById(user, id) {
+	async getInvestigationsById(user, id, selector) {
 		let res;
 		if (await this.allowed(user, 'read_all_investigations')) {
-			const investigations = await prisma.investigation.findFirst({
-				where: { Crime_No: Number(id) },
+			let investigations;
+			console.log('-------------.....................---', selector);
+			if (selector == 'report') {
+				console.log('--////////////////////////////-');
+
+				investigations = await prisma.investigation.findFirst({
+					where: { report_no: Number(id) },
+				});
+			} else if (selector == 'investigation') {
+				console.log('-------++++++++++++++++++++++++++-----');
+
+				investigations = await prisma.investigation.findFirst({
+					where: { investigations_No: Number(id) },
+				});
+			}
+			console.log('-------------------------------------');
+			console.log(investigations);
+			console.log('-------------------------------------');
+
+			let report = await prisma.reports.findFirst({
+				where: { report_No: investigations.report_no },
+			});
+			let facts = await prisma.facts_findings.findMany({
+				where: {
+					investigations_No: investigations.investigations_No,
+				},
 			});
 
-			res = { ...investigations };
+			res = { ...investigations, ...report, facts };
 		} else {
 			res = { message: 'you  are not authrized ' };
 		}
@@ -32,7 +56,13 @@ class InvestigationsService {
 		let res;
 		if (await this.allowed(user, 'create_investigation')) {
 			const investigations = await prisma.investigation.create({
-				data,
+				data: {
+					...data,
+					report_no: Number(data.report_no),
+					started_by: Number(user.id),
+					open_on: new Date(),
+					last_updated: new Date(),
+				},
 			});
 
 			res = { ...investigations };
@@ -47,10 +77,10 @@ class InvestigationsService {
 
 	async updateInvestigation(user, id, data) {
 		let res;
-		if (await this.allowed(user, 'update_investigation')) {
+		if (await this.allowed(user, 'modify_investigation')) {
 			const investigation = await prisma.investigation.update({
-				where: { id },
-				data,
+				where: { investigations_No: Number(id) },
+				data: { ...data, last_updated: new Date() },
 			});
 
 			res = { ...investigation };

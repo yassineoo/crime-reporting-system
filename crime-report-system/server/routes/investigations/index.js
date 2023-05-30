@@ -16,30 +16,56 @@ module.exports = (param) => {
 			return err;
 		}
 	});
-
-	router.get('/:idInvestigation', Authorization, async (req, res, next) => {
+	router.post('/create', Authorization, async (req, res) => {
 		try {
-			const { idInvestigation } = req.params;
-			const results = await investigations.getInvestigationtById(
-				idInvestigation
+			const data = req.body;
+			const results = await investigations.createInvestigation(
+				req.user,
+				data
 			);
+
 			return res.status(200).json(results);
 		} catch (err) {
-			return next(err);
+			console.log(err);
+			return err;
 		}
 	});
 
 	router.post(
-		'/createInvestigation',
+		'/:idInvestigation/update',
 		Authorization,
-		async (req, res, next) => {
+		async (req, res) => {
 			try {
-				const { data } = req.body;
-				const results = await investigation.createInvestigation(
+				const { idInvestigation } = req.params;
+				const data = req.body;
+				const results = await investigations.updateInvestigation(
+					req.user,
+					idInvestigation,
 					data
+				);
+
+				return res.status(200).json(results);
+			} catch (err) {
+				console.log(err);
+				return err;
+			}
+		}
+	);
+
+	router.get(
+		'/:idInvestigation/:selector',
+		Authorization,
+		async (req, res) => {
+			try {
+				const { idInvestigation, selector } = req.params;
+				const results = await investigations.getInvestigationById(
+					req.user,
+					idInvestigation,
+					selector
 				);
 				return res.status(200).json(results);
 			} catch (err) {
+				console.log(err);
 				return next(err);
 			}
 		}

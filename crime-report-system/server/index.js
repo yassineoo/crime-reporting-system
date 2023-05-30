@@ -29,8 +29,9 @@ app.use(
 		authentification,
 	})
 );
-
-app.use((req, res, next) => next(createError(404, 'File not found')));
+app.use(function (req, res, next) {
+	res.status(404).json({ error: 'Not found' });
+});
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
