@@ -76,7 +76,7 @@ class InvestigationsService {
 	}
 	async createFacts(user, data) {
 		let res;
-		if (await this.allowed(user, 'update_investigation')) {
+		if (await this.allowed(user, "modify_investigation")) {
 			const investigations = await prisma.facts_findings.create({
 				data: {
 					...data,
@@ -86,7 +86,7 @@ class InvestigationsService {
 			res = { ...investigations };
 		} else {
 			res = {
-				message: 'You are not authorized to Create Facts. ',
+				message: "You are not authorized to Create Facts. ",
 			};
 		}
 
@@ -94,7 +94,7 @@ class InvestigationsService {
 	}
 	async updateFacts(user, idFact, data) {
 		let res;
-		if (await this.allowed(user, 'update_investigation')) {
+		if (await this.allowed(user, "modify_investigation")) {
 			const investigations = await prisma.facts_findings.update({
 				where: { fact_id: idFact },
 				data: {
@@ -105,7 +105,7 @@ class InvestigationsService {
 			res = { ...investigations };
 		} else {
 			res = {
-				message: 'You are not authorized to Create Facts. ',
+				message: "You are not authorized to Create Facts. ",
 			};
 		}
 

@@ -7,7 +7,7 @@ export default function FactsFindings({ data }) {
 				<h3 className='text-xl text-center font-semibold w-48 relative top-0 -mt-8 bg-gray-100 px-2 '>
 					Facts and Findings
 				</h3>
-				<FindingsTable></FindingsTable>
+				<FindingsTable data={data}></FindingsTable>
 			</div>
 		</div>
 	);

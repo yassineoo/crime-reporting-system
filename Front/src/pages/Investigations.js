@@ -1,6 +1,8 @@
 import { filter } from "lodash";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { axiosInstance } from "../utils/axios";
 // @mui
 import {
 	Card,
@@ -28,8 +30,6 @@ import {
 	ReportListHead,
 	ReportListToolbar,
 } from "../sections/@dashboard/report";
-// mock
-import ReportLIST from "../_mock/investigations";
 
 // ----------------------------------------------------------------------
 
@@ -82,6 +82,8 @@ export function Investigations() {
 
 	const [page, setPage] = useState(0);
 
+	const [InvestigationLIST, setInvestigationLIST] = useState([]);
+
 	const [order, setOrder] = useState("asc");
 
 	const [selected, setSelected] = useState([]);
@@ -91,6 +93,22 @@ export function Investigations() {
 	const [filterName, setFilterName] = useState("");
 
 	const [rowsPerPage, setRowsPerPage] = useState(5);
+
+	async function getInvestigations() {
+		const token = localStorage.getItem("token");
+		const response = await axiosInstance.get("/investigations", {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+		const data = response.data;
+		console.log(response);
+		setInvestigationLIST(data);
+	}
+
+	useEffect(() => {
+		getInvestigations();
+	}, []);
 
 	const handleOpenMenu = (event) => {
 		setOpen(event.currentTarget);
@@ -108,7 +126,7 @@ export function Investigations() {
 
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
-			const newSelecteds = ReportLIST.map((n) => n.name);
+			const newSelecteds = InvestigationLIST.map((n) => n.name);
 			setSelected(newSelecteds);
 			return;
 		}
@@ -153,10 +171,12 @@ export function Investigations() {
 	};
 
 	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - ReportLIST.length) : 0;
+		page > 0
+			? Math.max(0, (1 + page) * rowsPerPage - InvestigationLIST.length)
+			: 0;
 
 	const filteredReports = applySortFilter(
-		ReportLIST,
+		InvestigationLIST,
 		getComparator(order, orderBy),
 		filterName
 	);
@@ -195,7 +215,7 @@ export function Investigations() {
 								order={order}
 								orderBy={orderBy}
 								headLabel={TABLE_HEAD}
-								rowCount={ReportLIST.length}
+								rowCount={InvestigationLIST.length}
 								numSelected={selected.length}
 								onRequestSort={handleRequestSort}
 								onSelectAllClick={handleSelectAllClick}
@@ -204,59 +224,64 @@ export function Investigations() {
 								{filteredReports
 									.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 									.map((row) => {
-										const { id, idReport, openingDate, closingDate, status } =
-											row;
-										const selectedReport = selected.indexOf(idReport) !== -1;
+										const {
+											investigations_No,
+											Status,
+											open_on,
+											close_on,
+											started_by,
+											conclusion,
+											report_no,
+											description,
+											assigned_to,
+											priority,
+											last_updated,
+										} = row;
+										const selectedReport =
+											selected.indexOf(investigations_No) !== -1;
 
 										return (
 											<TableRow
 												hover
-												key={id}
+												key={investigations_No}
 												tabIndex={-1}
 												role='checkbox'
 												selected={selectedReport}
-												onClick={() => handleClickOnRow(id)}
+												onClick={() => handleClickOnRow(investigations_No)}
 												className='cursor-pointer'
 											>
 												<TableCell padding='checkbox'>
 													<Checkbox
 														checked={selectedReport}
-														onChange={(event) => handleClick(event, idReport)}
+														onChange={(event) =>
+															handleClick(event, investigations_No)
+														}
 													/>
 												</TableCell>
 
-												<TableCell align='left'>{id}</TableCell>
+												<TableCell align='left'>{investigations_No}</TableCell>
 
-												<TableCell component='th' scope='row' padding='none'>
-													<Stack
-														direction='row'
-														alignItems='center'
-														spacing={2}
-													>
-														<Typography variant='subtitle2' noWrap>
-															{idReport}
-														</Typography>
-													</Stack>
+												<TableCell align='left'>{report_no}</TableCell>
+
+												<TableCell align='left'>
+													{open_on.toLocaleString()}
 												</TableCell>
 
 												<TableCell align='left'>
-													{openingDate.toLocaleString()}
-												</TableCell>
-
-												<TableCell align='left'>
-													{closingDate.toLocaleString()}
+													{close_on !== null
+														? close_on.toLocaleString()
+														: "TBD"}
 												</TableCell>
 
 												<TableCell align='left'>
 													<Label
 														color={
-															(status === "Closed" && "error") ||
-															(status === "Pending" && "warning") ||
-															(status === "Archived" && "default") ||
+															(Status === "completed" && "error") ||
+															(Status === "pending" && "warning") ||
 															"success"
 														}
 													>
-														{status}
+														{Status}
 													</Label>
 												</TableCell>
 
@@ -308,7 +333,7 @@ export function Investigations() {
 					<TablePagination
 						rowsPerPageOptions={[5, 10, 25]}
 						component='div'
-						count={ReportLIST.length}
+						count={InvestigationLIST.length}
 						rowsPerPage={rowsPerPage}
 						page={page}
 						onPageChange={handleChangePage}

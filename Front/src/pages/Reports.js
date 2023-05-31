@@ -40,10 +40,10 @@ import {
 
 const TABLE_HEAD = [
 	{ id: "id", label: "#", alignRight: false },
-	{ id: "citizenName", label: "Citizen name", alignRight: false },
 	{ id: "date", label: "Date", alignRight: false },
 	{ id: "sector", label: "Sector", alignRight: false },
 	{ id: "type", label: "Type", alignRight: false },
+	{ id: "status", label: "Status", alignRight: false },
 	{ id: "" },
 ];
 
@@ -107,18 +107,7 @@ export function Reports() {
 			},
 		});
 		const data = response.data;
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
 		console.log(response);
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-		console.log("hhhhhhhhhhhhhhhhhh--------------------------");
-
 		setReportLIST(data);
 	}
 
@@ -233,54 +222,45 @@ export function Reports() {
 									.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 									.map((row) => {
 										const {
-											Crime_No,
+											report_No,
 											Status,
-											Category,
-											Description,
-											Crime_Scene,
-											Suspects,
-											phoneNumber,
-											Address,
-											evidence,
+											Type,
+											incident_location,
+											victime_statement,
+											provided_evidence,
+											Sector,
+											incident_date,
+											submission_date,
+											citizen_id,
 										} = row;
-										const selectedReport = selected.indexOf(Crime_No) !== -1;
+										const selectedReport = selected.indexOf(report_No) !== -1;
 
 										return (
 											<TableRow
 												hover
-												key={Crime_No}
+												key={report_No}
 												tabIndex={-1}
 												role='checkbox'
 												selected={selectedReport}
-												onClick={() => handleClickOnRow(Crime_No)}
+												onClick={() => handleClickOnRow(report_No)}
 												className='cursor-pointer'
 											>
 												<TableCell padding='checkbox'>
 													<Checkbox
 														checked={selectedReport}
-														onChange={(event) => handleClick(event, Crime_No)}
+														onChange={(event) => handleClick(event, report_No)}
 													/>
 												</TableCell>
 
-												<TableCell align='left'>{Crime_No}</TableCell>
+												<TableCell align='left'>{report_No}</TableCell>
 
-												<TableCell component='th' scope='row' padding='none'>
-													<Stack
-														direction='row'
-														alignItems='center'
-														spacing={2}
-													>
-														<Typography variant='subtitle2' noWrap>
-															{"Cristiano Ronaldo"}
-														</Typography>
-													</Stack>
-												</TableCell>
+												<TableCell align='left'>{submission_date}</TableCell>
 
-												<TableCell align='left'>{"10/10/1001"}</TableCell>
+												<TableCell align='left'>{incident_location}</TableCell>
 
-												<TableCell align='left'>{Crime_Scene}</TableCell>
+												<TableCell align='left'>{Type}</TableCell>
 
-												<TableCell align='left'>{Category}</TableCell>
+												<TableCell align='left'>{Status}</TableCell>
 
 												<TableCell align='right'>
 													<IconButton

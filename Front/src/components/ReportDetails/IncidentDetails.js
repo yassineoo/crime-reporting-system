@@ -24,7 +24,7 @@ export default function IncidentDetails({ data }) {
 				</div>
 				<div className='col-span-1 font-normal mb-1 flex'>
 					<div>
-						<h4 className='text-lg font-semibold'>Vectim statement :&nbsp; </h4>
+						<h4 className='text-lg font-semibold'>Victim statement :&nbsp; </h4>
 						{"  "}
 						<p>{data.statement}</p>
 					</div>

@@ -1,25 +1,28 @@
 import { filter } from "lodash";
 import { sentenceCase } from "change-case";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { axiosInstance } from "../../utils/axios";
+import { useEffect } from "react";
+
 // @mui
 import {
-  Card,
-  Table,
-  Stack,
-  Paper,
-  Avatar,
-  Button,
-  Popover,
-  Checkbox,
-  TableRow,
-  MenuItem,
-  TableBody,
-  TableCell,
-  Container,
-  Typography,
-  IconButton,
-  TableContainer,
-  TablePagination,
+	Card,
+	Table,
+	Stack,
+	Paper,
+	Avatar,
+	Button,
+	Popover,
+	Checkbox,
+	TableRow,
+	MenuItem,
+	TableBody,
+	TableCell,
+	Container,
+	Typography,
+	IconButton,
+	TableContainer,
+	TablePagination,
 } from "@mui/material";
 // components
 import Label from "../label";
@@ -27,325 +30,371 @@ import Iconify from "../iconify";
 import Scrollbar from "../scrollbar";
 // sections
 import {
-  FindingListHead,
-  FindingListToolbar,
+	FindingListHead,
+	FindingListToolbar,
 } from "../../sections/@dashboard/finding";
-// mock
-import FINDINGLIST from "../../_mock/findings";
+import { useParams } from "react-router-dom";
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: "date", label: "Date", alignRight: false },
-  { id: "time", label: "Time", alignRight: false },
-  { id: "content", label: "Content", alignRight: false },
-  { id: "" },
+	{ id: "date", label: "Date", alignRight: false },
+	{ id: "time", label: "Time", alignRight: false },
+	{ id: "content", label: "Content", alignRight: false },
+	{ id: "" },
 ];
 
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
+	if (b[orderBy] < a[orderBy]) {
+		return -1;
+	}
+	if (b[orderBy] > a[orderBy]) {
+		return 1;
+	}
+	return 0;
 }
 
 function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+	return order === "desc"
+		? (a, b) => descendingComparator(a, b, orderBy)
+		: (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(
-      array,
-      (_report) =>
-        _report.citizenName.toLowerCase().indexOf(query.toLowerCase()) !== -1
-    );
-  }
-  return stabilizedThis.map((el) => el[0]);
+	const stabilizedThis = array.map((el, index) => [el, index]);
+	stabilizedThis.sort((a, b) => {
+		const order = comparator(a[0], b[0]);
+		if (order !== 0) return order;
+		return a[1] - b[1];
+	});
+	if (query) {
+		return filter(
+			array,
+			(_report) =>
+				_report.citizenName.toLowerCase().indexOf(query.toLowerCase()) !== -1
+		);
+	}
+	return stabilizedThis.map((el) => el[0]);
 }
 
-export function FindingsTable() {
-  const [open, setOpen] = useState(null);
+export function FindingsTable({ data }) {
+	const [FINDINGLIST, setFINDINGLIST] = useState(data);
 
-  const [page, setPage] = useState(0);
+	const [open, setOpen] = useState(null);
 
-  const [order, setOrder] = useState("asc");
+	const [page, setPage] = useState(0);
 
-  const [selected, setSelected] = useState([]);
+	const [order, setOrder] = useState("asc");
 
-  const [orderBy, setOrderBy] = useState("name");
+	const [selected, setSelected] = useState([]);
 
-  const [filterName, setFilterName] = useState("");
+	const [orderBy, setOrderBy] = useState("name");
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+	const [filterName, setFilterName] = useState("");
 
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget);
-  };
+	const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleCloseMenu = () => {
-    setOpen(null);
-  };
+	const { id } = useParams();
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
+	const handleOpenMenu = (event) => {
+		setOpen(event.currentTarget);
+	};
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = FINDINGLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
+	const handleCloseMenu = () => {
+		setOpen(null);
+	};
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
+	const handleRequestSort = (event, property) => {
+		const isAsc = orderBy === property && order === "asc";
+		setOrder(isAsc ? "desc" : "asc");
+		setOrderBy(property);
+	};
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+	const handleSelectAllClick = (event) => {
+		if (event.target.checked) {
+			const newSelecteds = FINDINGLIST.map((n) => n.name);
+			setSelected(newSelecteds);
+			return;
+		}
+		setSelected([]);
+	};
 
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
+	useEffect(() => {
+		setFINDINGLIST(data);
+	}, [data]);
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - FINDINGLIST.length) : 0;
+	const handleClick = (event, name) => {
+		const selectedIndex = selected.indexOf(name);
+		let newSelected = [];
+		if (selectedIndex === -1) {
+			newSelected = newSelected.concat(selected, name);
+		} else if (selectedIndex === 0) {
+			newSelected = newSelected.concat(selected.slice(1));
+		} else if (selectedIndex === selected.length - 1) {
+			newSelected = newSelected.concat(selected.slice(0, -1));
+		} else if (selectedIndex > 0) {
+			newSelected = newSelected.concat(
+				selected.slice(0, selectedIndex),
+				selected.slice(selectedIndex + 1)
+			);
+		}
+		setSelected(newSelected);
+	};
 
-  const filteredReports = applySortFilter(
-    FINDINGLIST,
-    getComparator(order, orderBy),
-    filterName
-  );
+	const handleChangePage = (event, newPage) => {
+		setPage(newPage);
+	};
 
-  const isNotFound = !filteredReports.length && !!filterName;
+	const handleChangeRowsPerPage = (event) => {
+		setPage(0);
+		setRowsPerPage(parseInt(event.target.value, 10));
+	};
 
-  const [showForm, setShowForm] = useState(false);
+	const emptyRows =
+		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - FINDINGLIST.length) : 0;
 
-  const handleAddButtonClick = () => {
-    setShowForm(true);
-  };
+	const filteredReports = applySortFilter(
+		FINDINGLIST,
+		getComparator(order, orderBy),
+		filterName
+	);
 
-  return (
-    <>
-      <Card>
-        <TableContainer>
-          <Table>
-            <FindingListHead
-              order={order}
-              orderBy={orderBy}
-              headLabel={TABLE_HEAD}
-              rowCount={FINDINGLIST.length}
-              numSelected={selected.length}
-              onRequestSort={handleRequestSort}
-              onSelectAllClick={handleSelectAllClick}
-            />
-            <TableBody className="justify-start">
-              {filteredReports
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  const { date, time, content } = row;
-                  const selectedReport = selected.indexOf(date) !== -1;
+	const isNotFound = !filteredReports.length && !!filterName;
 
-                  return (
-                    <TableRow
-                      hover
-                      key={date + time}
-                      tabIndex={-1}
-                      role="checkbox"
-                      selected={selectedReport}
-                    >
-                      <TableCell align="left">
-                        {date.toLocaleString()}
-                      </TableCell>
+	const [showForm, setShowForm] = useState(false);
 
-                      <TableCell align="left">{time}</TableCell>
+	const handleAddButtonClick = () => {
+		setShowForm(true);
+	};
 
-                      <TableCell align="left">{content}</TableCell>
+	const fact_time_ref = useRef();
+	const fact_date_ref = useRef();
+	const content_ref = useRef();
 
-                      <TableCell align="right">
-                        <div className="flex justify-end">
-                          <MenuItem>
-                            <Iconify icon={"eva:edit-fill"} />
-                          </MenuItem>
+	async function addFact() {
+		let investigations_No = parseInt(id);
 
-                          <MenuItem sx={{ color: "error.main" }}>
-                            <Iconify icon={"eva:trash-2-outline"} />
-                          </MenuItem>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 30 * emptyRows }}>
-                  <TableCell colSpan={5} />
-                </TableRow>
-              )}
-            </TableBody>
+		const fact_time = fact_time_ref.current.value;
+		const fact_date = fact_date_ref.current.value;
+		const content = content_ref.current.value;
+		const fact_id = id * 10 + FINDINGLIST.length;
+		let body = {
+			fact_id,
+			fact_time,
+			fact_date,
+			content,
+			investigations_No,
+		};
+		console.log(body);
 
-            {isNotFound && (
-              <TableBody>
-                <TableRow>
-                  <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                    <Paper
-                      sx={{
-                        textAlign: "center",
-                      }}
-                    >
-                      <Typography variant="h6" paragraph>
-                        Not found
-                      </Typography>
+		setFINDINGLIST([...FINDINGLIST, body]);
 
-                      <Typography variant="body2">
-                        No results found for &nbsp;
-                        <strong>&quot;{filterName}&quot;</strong>.
-                        <br /> Try checking for typos or using complete words.
-                      </Typography>
-                    </Paper>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            )}
-          </Table>
-        </TableContainer>
+		const token = localStorage.getItem("token");
+		const response = await axiosInstance.post(
+			`/investigations/createFact`,
+			body,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+	}
 
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={FINDINGLIST.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
+	return (
+		<>
+			<Card>
+				<TableContainer>
+					<Table>
+						<FindingListHead
+							order={order}
+							orderBy={orderBy}
+							headLabel={TABLE_HEAD}
+							rowCount={FINDINGLIST.length}
+							numSelected={selected.length}
+							onRequestSort={handleRequestSort}
+							onSelectAllClick={handleSelectAllClick}
+						/>
+						<TableBody className='justify-start'>
+							{filteredReports
+								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+								.map((row) => {
+									console.log(row);
+									const { fact_date, fact_time, content } = row;
+									const selectedReport = selected.indexOf(fact_date) !== -1;
 
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: "top", horizontal: "left" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            "& .MuiMenuItem-root": {
-              px: 1,
-              typography: "body2",
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={"eva:edit-fill"} sx={{ mr: 2 }} />
-        </MenuItem>
+									return (
+										<TableRow
+											hover
+											key={fact_date + fact_time}
+											tabIndex={-1}
+											role='checkbox'
+											selected={selectedReport}
+										>
+											<TableCell align='left'>{fact_date}</TableCell>
 
-        <MenuItem sx={{ color: "error.main" }}>
-          <Iconify icon={"eva:trash-2-outline"} sx={{ mr: 2 }} />
-        </MenuItem>
-      </Popover>
+											<TableCell align='left'>{fact_time}</TableCell>
 
-      {showForm && (
-        <div className="fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-8 w-1/3">
-            <form>
-              <h3 className="text-xl mb-6 text-center font-bold">
-                Add a Finding
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <label className="block text-gray-700 font-bold">Date</label>
-                <div className="flex">
-                  {
-                    <input
-                      id="date"
-                      className="appearance-none border rounded w-full py-2 px-3 h-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      type="date"
-                    />
-                  }
-                </div>
+											<TableCell align='left'>{content}</TableCell>
 
-                <label className="block text-gray-700 font-bold">Time</label>
-                <div className="flex">
-                  {
-                    <input
-                      id="time"
-                      className="appearance-none border rounded w-full py-2 px-3 h-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      type="time"
-                    />
-                  }
-                </div>
-                <label className="block text-gray-700 font-bold">Content</label>
-                <div className="flex">
-                  {
-                    <textarea
-                      id="content"
-                      className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      type="text"
-                    ></textarea>
-                  }
-                </div>
-              </div>
-              <div className="flex justify-center mt-6">
-                <Button
-                  className="w-1/6"
-                  variant="contained"
-                  startIcon={<Iconify icon="eva:plus-fill" />}
-                  onClick={() => setShowForm(false)}
-                >
-                  Add
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+											<TableCell align='right'>
+												<div className='flex justify-end'>
+													<MenuItem>
+														<Iconify icon={"eva:edit-fill"} />
+													</MenuItem>
 
-      <div className="flex justify-center mt-2">
-        <Button
-          className="w-1/6"
-          variant="contained"
-          startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={handleAddButtonClick}
-        >
-          Add
-        </Button>
-      </div>
-    </>
-  );
+													<MenuItem sx={{ color: "error.main" }}>
+														<Iconify icon={"eva:trash-2-outline"} />
+													</MenuItem>
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
+							{emptyRows > 0 && (
+								<TableRow style={{ height: 30 * emptyRows }}>
+									<TableCell colSpan={5} />
+								</TableRow>
+							)}
+						</TableBody>
+
+						{isNotFound && (
+							<TableBody>
+								<TableRow>
+									<TableCell align='center' colSpan={6} sx={{ py: 3 }}>
+										<Paper
+											sx={{
+												textAlign: "center",
+											}}
+										>
+											<Typography variant='h6' paragraph>
+												Not found
+											</Typography>
+
+											<Typography variant='body2'>
+												No results found for &nbsp;
+												<strong>&quot;{filterName}&quot;</strong>.
+												<br /> Try checking for typos or using complete words.
+											</Typography>
+										</Paper>
+									</TableCell>
+								</TableRow>
+							</TableBody>
+						)}
+					</Table>
+				</TableContainer>
+
+				<TablePagination
+					rowsPerPageOptions={[5, 10, 25]}
+					component='div'
+					count={FINDINGLIST.length}
+					rowsPerPage={rowsPerPage}
+					page={page}
+					onPageChange={handleChangePage}
+					onRowsPerPageChange={handleChangeRowsPerPage}
+				/>
+			</Card>
+
+			<Popover
+				open={Boolean(open)}
+				anchorEl={open}
+				onClose={handleCloseMenu}
+				anchorOrigin={{ vertical: "top", horizontal: "left" }}
+				transformOrigin={{ vertical: "top", horizontal: "right" }}
+				PaperProps={{
+					sx: {
+						p: 1,
+						width: 140,
+						"& .MuiMenuItem-root": {
+							px: 1,
+							typography: "body2",
+							borderRadius: 0.75,
+						},
+					},
+				}}
+			>
+				<MenuItem>
+					<Iconify icon={"eva:edit-fill"} sx={{ mr: 2 }} />
+				</MenuItem>
+
+				<MenuItem sx={{ color: "error.main" }}>
+					<Iconify icon={"eva:trash-2-outline"} sx={{ mr: 2 }} />
+				</MenuItem>
+			</Popover>
+
+			{showForm && (
+				<div className='fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex justify-center items-center'>
+					<div className='bg-white rounded-lg p-8 w-1/3'>
+						<form>
+							<h3 className='text-xl mb-6 text-center font-bold'>
+								Add a Finding
+							</h3>
+							<div className='grid grid-cols-2 gap-4'>
+								<label className='block text-gray-700 font-bold'>Date</label>
+								<div className='flex'>
+									{
+										<input
+											id='date'
+											className='appearance-none border rounded w-full py-2 px-3 h-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+											type='date'
+											ref={fact_date_ref}
+										/>
+									}
+								</div>
+
+								<label className='block text-gray-700 font-bold'>Time</label>
+								<div className='flex'>
+									{
+										<input
+											id='time'
+											className='appearance-none border rounded w-full py-2 px-3 h-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+											type='time'
+											ref={fact_time_ref}
+										/>
+									}
+								</div>
+								<label className='block text-gray-700 font-bold'>Content</label>
+								<div className='flex'>
+									{
+										<textarea
+											id='content'
+											className='appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+											type='text'
+											ref={content_ref}
+										></textarea>
+									}
+								</div>
+							</div>
+							<div className='flex justify-center mt-6'>
+								<Button
+									className='w-1/6'
+									variant='contained'
+									startIcon={<Iconify icon='eva:plus-fill' />}
+									onClick={() => {
+										addFact();
+										setShowForm(false);
+									}}
+								>
+									Add
+								</Button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
+
+			<div className='flex justify-center mt-2'>
+				<Button
+					className='w-1/6'
+					variant='contained'
+					startIcon={<Iconify icon='eva:plus-fill' />}
+					onClick={handleAddButtonClick}
+				>
+					Add
+				</Button>
+			</div>
+		</>
+	);
 }
