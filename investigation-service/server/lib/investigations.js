@@ -74,6 +74,43 @@ class InvestigationsService {
 
 		return res;
 	}
+	async createFacts(user, data) {
+		let res;
+		if (await this.allowed(user, 'update_investigation')) {
+			const investigations = await prisma.facts_findings.create({
+				data: {
+					...data,
+				},
+			});
+
+			res = { ...investigations };
+		} else {
+			res = {
+				message: 'You are not authorized to Create Facts. ',
+			};
+		}
+
+		return res;
+	}
+	async updateFacts(user, idFact, data) {
+		let res;
+		if (await this.allowed(user, 'update_investigation')) {
+			const investigations = await prisma.facts_findings.update({
+				where: { fact_id: idFact },
+				data: {
+					...data,
+				},
+			});
+
+			res = { ...investigations };
+		} else {
+			res = {
+				message: 'You are not authorized to Create Facts. ',
+			};
+		}
+
+		return res;
+	}
 
 	async updateInvestigation(user, id, data) {
 		let res;

@@ -71,6 +71,41 @@ module.exports = (config) => {
 			return next(err);
 		}
 	});
+	service.post('/investigations/createFact', async (req, res, next) => {
+		const user = {
+			id: req.headers.user_id,
+			idRole: req.headers.user_role,
+		};
+
+		const data = req.body;
+		try {
+			return res.json(await investigations.createFacts(user, data));
+		} catch (err) {
+			console.log(err);
+			return next(err);
+		}
+	});
+	service.post(
+		'/investigations/updateFact/:idFact',
+		async (req, res, next) => {
+			const user = {
+				id: req.headers.user_id,
+				idRole: req.headers.user_role,
+			};
+			const { idFact } = req.params;
+
+			const data = req.body;
+			try {
+				return res.json(
+					await investigations.createFacts(user, idFact, data)
+				);
+			} catch (err) {
+				console.log(err);
+				return next(err);
+			}
+		}
+	);
+
 	service.post(
 		'/investigations/:idInvestigation/update',
 		async (req, res, next) => {

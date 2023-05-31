@@ -3,6 +3,7 @@ const LOCKOUT_DURATION = 30 * 60 * 1000; // Lockout duration in milliseconds (30
 const bcrypt = require('bcrypt');
 const prisma = require('../../prisma/dbConnection');
 const jwt = require('jsonwebtoken');
+const amqplib = require('amqplib');
 class AuthentificationService {
 	constructor() {
 		this.jwtSecret = 'server-secret';
@@ -65,17 +66,23 @@ class AuthentificationService {
 				},
 			});
 
-			if (attempts >= MAX_LOGIN_ATTEMPTS) {
+			if (attempts + 1 >= MAX_LOGIN_ATTEMPTS) {
 				const q = 'alertMessage';
 				const conn = await amqplib.connect('amqp://localhost');
-				const channel = await conn.createannelannel();
+				console.log('*******************************');
+				console.log('*******************************');
+				//console.log(conn);
+				const channel = await conn.createChannel();
 				await channel.assertQueue(q);
 				const qm = JSON.stringify({
 					user: user.id,
 					date: new Date(),
 					message: 'trying to login many times',
 				});
-				return channel.sendToQueue(q, Buffer.from(qm, 'utf8'));
+				console.log('*******************************');
+				console.log('*******************************');
+				console.log('*******************************');
+				channel.sendToQueue(q, Buffer.from(qm, 'utf8'));
 			}
 
 			return {
