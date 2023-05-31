@@ -4,10 +4,46 @@ const express = require("express");
 const Reports = require("./lib/reports");
 
 const service = express();
+
+var jsAspect = require("js-aspect");
+const fs = require("fs");
+
+// Define a custom logging advice
+function loggingAdvice(executionContext, userId, userRole) {
+	// Get the current time
+	const currentTime = new Date().toISOString();
+	// Get the target, method, and arguments from the execution context
+	const { target, method, arguments } = executionContext;
+
+	// Create a log message
+	const logMessage = `Time: ${currentTime} | User ID: ${userId} | Role: ${userRole} | Method '${
+		method.name
+	}' called with arguments: ${JSON.stringify(arguments)}`;
+
+	// Append the log message to a log file
+	fs.writeFileSync("log.txt", logMessage + "\n", (err) => {
+		if (err) {
+			console.error("Error writing to log file:", err);
+		}
+	});
+}
+
+// Create an instance of the Before advice with the loggingAdvice function
+jsAspect.after(
+	service,
+	function (context) {
+		loggingAdvice(context, userId, userRole);
+	},
+	jsAspect.SCOPE.METHODS
+);
+
+let userId;
+let userRole;
+
 const cors = require("cors");
 service.use(
 	cors({
-		origin: "http://localhost:3000",
+		origin: "*",
 		methods: ["GET", "POST"],
 		allowedHeaders: ["Content-Type", "Authorization"],
 	})
@@ -30,6 +66,8 @@ module.exports = (config) => {
 			id: req.headers.user_id,
 			idRole: req.headers.user_role,
 		};
+		userId = req.headers.user_id;
+		userRole = req.headers.user_role;
 		try {
 			//return res.status(200).json({ results: [1, 2, 5] });
 			return res.json(await reports.getReportsList(user));

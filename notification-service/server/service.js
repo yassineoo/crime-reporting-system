@@ -1,5 +1,5 @@
-const express = require('express');
-const amqplib = require('amqplib');
+const express = require("express");
+const amqplib = require("amqplib");
 
 //const Notification = require('./lib/notification');
 
@@ -10,10 +10,10 @@ module.exports = (config) => {
 
 	const log = config.log();
 
-	const q = 'alertMessage';
+	const q = "alertMessage2";
 	async function connectAndConsume() {
 		try {
-			const conn = await amqplib.connect('amqp://localhost');
+			const conn = await amqplib.connect("amqp://localhost");
 			const ch = await conn.createChannel();
 			await ch.assertQueue(q);
 			await ch.consume(q, async (msg) => {
@@ -21,7 +21,7 @@ module.exports = (config) => {
 					log.debug(`Got message ${msg.content.toString()}`);
 					const qm = JSON.parse(msg.content.toString());
 
-					log(qm.user + ' is trying to hacked ');
+					log(qm.user + " is trying to hacked ");
 
 					await ch.ack(msg);
 				}
@@ -38,17 +38,17 @@ module.exports = (config) => {
 	}
 
 	// Add a request logging middleware in development mode
-	if (service.get('env') === 'development') {
+	if (service.get("env") === "development") {
 		service.use((req, res, next) => {
 			log.debug(`${req.method}: ${req.url}`);
 			return next();
 		});
 	}
-	service.get('/test', (req, res) => {
-		res.send('test');
+	service.get("/test", (req, res) => {
+		res.send("test");
 	});
 	service.use(function (req, res, next) {
-		res.status(404).json({ error: 'Not found' });
+		res.status(404).json({ error: "Not found" });
 	});
 
 	// eslint-disable-next-line no-unused-vars

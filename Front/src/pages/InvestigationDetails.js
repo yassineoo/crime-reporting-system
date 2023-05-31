@@ -42,7 +42,7 @@ export function InvestigationDetails() {
 		let openingtime = data.open_on.split("T")[1];
 		let closingdate = "TBD";
 		let closingtime = "TBD";
-		if (data.close_on != "") {
+		if (data.close_on != null) {
 			closingdate = data.close_on.split("T")[0];
 			closingtime = data.close_on.split("T")[1];
 		}
